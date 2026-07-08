@@ -83,7 +83,7 @@ M.macro_recording = function()
     return ""
   end
 
-  return "%#St_lspWarning# 󰑋 " .. reg .. " "
+  return "%#St_lspWarning#󰑊 " .. reg .. " "
 end
 
 ---@return string
@@ -177,7 +177,7 @@ M.cursor = function()
 end
 
 M["%="] = "%="
-M.truncation_point = "  %<"
+M.truncation_point = "%<"
 
 ---@return string
 return function()

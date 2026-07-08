@@ -14,8 +14,8 @@ end
 local default_order = {
   "mode",
   "macro_recording",
-  "git",
   "truncation_point",
+  "git",
   "file_path",
   "symbols",
   "%=",
@@ -32,8 +32,8 @@ local default_order = {
 local default_order_no_lsp_msg = {
   "mode",
   "macro_recording",
-  "git",
   "truncation_point",
+  "git",
   "file_path",
   "symbols",
   "%=",
@@ -276,7 +276,7 @@ M.git = function()
   local removed = (git_status.removed and git_status.removed ~= 0) and ("  " .. git_status.removed) or ""
   local branch_name = " " .. git_status.head
 
-  return " " .. branch_name .. added .. changed .. removed
+  return branch_name .. added .. changed .. removed .. "  "
 end
 
 ---@return string
@@ -318,13 +318,13 @@ end
 
 ---@type table<NvStatuslineSeparatorStyle, NvStatuslineSeparator>
 M.separators = {
-  default = { left = "", right = "" },
-  round = { left = "", right = "" },
-  block = { left = "█", right = "█" },
-  arrow = { left = "", right = "" },
+  default = { left = "", right = " " },
+  round = { left = "", right = " " },
+  block = { left = "█", right = "█ " },
+  arrow = { left = "", right = " " },
 }
 
-M.symbols_sep = "  "
+M.symbols_sep = "  "
 
 ---@type string[]
 local spinners = { "", "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤", "󰪥", "" }
