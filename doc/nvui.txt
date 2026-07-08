@@ -307,8 +307,7 @@ This example maps Alt+number keys to switch buffer
 ==============================================================================
 4. Statusline                                                  *nvui.statusline*
 
-NvChad's statusline is minimal & customizable with less abstraction
-for custom modules, it has 4 themes.
+NvChad's statusline is minimal & customizable with less abstraction for custom modules.
 
 Managing modules example: ~
 >lua
@@ -317,6 +316,10 @@ Managing modules example: ~
      theme = "default", 
      separator_style = "default",
      order = { "mode", "f", "git", "%=", "lsp_msg", "%=", "lsp", "cwd", "xyz", "abc" },
+     enabled_modules = {
+       git = false,
+       lsp_msg = false,
+     },
      modules = {
        abc = function()
          return "hi"
@@ -345,6 +348,10 @@ separator_style: ~
 Order: ~
   - The order can be found at 
     `https://github.com/NvChad/ui/blob/v3.0/lua/nvchad/stl/utils.lua`
+
+enabled_modules: ~
+  - A table of module names mapped to booleans.
+  - Set a module to `false` to hide it from the statusline order.
 
 ==============================================================================
 5. Term                                                              *nvui.term*
@@ -398,6 +405,7 @@ Available options are:
 >lua
  require("nvchad.term").new { pos = "sp", size = 0.3 }
  require("nvchad.term").new { pos = "vsp", cmd = "neofetch"}
+ require("nvchad.term").new { pos = "float", cmd = "opencode" }
 <
 -------------------------------------------------------------------------------
 5.3 Toggle Window                                              *nvui.term.toggle*
@@ -406,6 +414,7 @@ This function toggles the terminal window, make sure to provide an unique id.
 >lua
  require("nvchad.term").toggle { pos = "sp", id = "xz" }
  require("nvchad.term").toggle { pos = "float", id = "fa", cmd ='lazygit' }
+ require("nvchad.term").toggle { pos = "float", id = "opencode", cmd = "opencode" }
  require("nvchad.term").toggle { pos = "vsp", id = "floo", size = 0.3 }
 
  -- always map it in "t" i.e terminal mode too
