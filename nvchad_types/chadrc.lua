@@ -67,10 +67,10 @@
 ---@field style? '"default"'|'"flat_light"'|'"flat_dark"'|'"atom"'|'"atom_colored"'
 --- Only has effects when the style is `default`
 --- Max width of main completion text in cmp
---- @field abbr_maxwidth? integer
---- @field icons_left? boolean
+---@field abbr_maxwidth? integer
+---@field icons_left? boolean
 --- places lspkind icons to the left, only for non-atom styles
---- @field format_colors? NvCmpFormatColors
+---@field format_colors? NvCmpFormatColors
 
 ---@class NvTelescopeConfig
 --- Telescope style
@@ -80,12 +80,15 @@
 ---@field enabled? boolean
 --- statusline theme
 ---@field theme? '"default"'|'"vscode"'|'"vscode_colored"'|'"minimal"'
+---@field show_lsp_msg? boolean showing LSP messages in statusline
 --- Separator style for NvChad Statusline
 ---     - Only when the *theme* is `minimal`, "round" or "block" will be having effect
 ---@field separator_style? '"default"'|'"round"'|'"block"'|'"arrow"'|{ left: string, right: string }
 --- The list of module names from default modules + your modules
 --- Check https://github.com/NvChad/ui/blob/v2.5/lua/nvchad/stl/utils.lua#L12 for the modules of each statusline theme
 ---@field order? string[]
+--- Enable or disable statusline modules by name. Undefined modules are enabled.
+---@field enabled_modules? table<string, boolean>
 --- Your modules to be added to the statusline
 --- ```lua
 ---     modules = {
@@ -95,6 +98,9 @@
 ---     }
 --- ```
 ---@field modules? table<string, string | fun(): string>
+---if symbols or file_path tokens exceed truncation_length, they will be truncated to truncation_length chars with "…"
+---@field truncation_length? number
+
 --- Maximum length for the progress messages section
 --- Options for NvChad Tabufline
 ---@class NvTabLineConfig
@@ -124,13 +130,20 @@
 --- Each string is one line
 ---@field header? string[] | (fun(): string[])
 --- List of buttons to show on the dashboard
----@field buttons? NvDashButtonConfig[]
+---@field buttons? NvDashButtonConfig[] | (fun(): NvDashButtonConfig[])
 
 ---@class NvDashButtonConfig
 ---@field txt string | (fun(): string) # Descrption of the button
+---@field keys? string
+---@field cmd? string
 ---@field hl? string name of the highlight group
 ---@field no_gap? boolean true by default, this wont make next line empty
 ---@field rep? boolean used to repeat txt till space available, use only when txt is 1 char
+---@field content? '"fit"'
+---@field group? string
+---@field pad? integer|'"full"'
+---@field multicolumn? boolean
+---@field [integer] NvDashButtonConfig
 
 ---@class NvCheatsheetConfig
 --- Cheatsheet theme
@@ -156,6 +169,7 @@
 ---@field border? string
 
 ---@class TermConfig
+---@field startinsert? boolean
 ---@field base46_colors? boolean
 ---@field winopts? table
 ---@field sizes? TermSizes
@@ -164,6 +178,7 @@
 ---@class MasonConfig
 ---@field command? boolean
 ---@field pkgs? string[]
+---@field skip? string[]
 
 ---@class ColorifyConfig
 ---@field enabled? boolean

@@ -1,10 +1,15 @@
 local M = {}
 local api = vim.api
+---@type NvCmpConfig
 local cmp_ui = require("nvconfig").ui.cmp
 local icon = cmp_ui.format_colors.icon .. " "
 
+---@type table<string, boolean>
 local hlcache = {}
 
+---@param entry NvCmpEntry
+---@param item NvCmpCompletionItem
+---@param kind_txt string
 M.lsp = function(entry, item, kind_txt)
   local color = entry.completion_item.documentation
 

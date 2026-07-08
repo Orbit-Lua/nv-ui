@@ -1,5 +1,6 @@
 dofile(vim.g.base46_cache .. "blink")
 
+---@type table
 local opts = {
   snippets = { preset = "luasnip" },
   cmdline = { enabled = true },

@@ -7,6 +7,7 @@ local actions = require "telescope.actions"
 local action_set = require "telescope.actions.set"
 local action_state = require "telescope.actions.state"
 
+---@param name string
 local function reload_theme(name)
   require("nvconfig").base46.theme = name
   require("base46").load_all_highlights()
@@ -17,6 +18,8 @@ local function switcher()
 
   -- show current buffer content in previewer
   local previewer = previewers.new_buffer_previewer {
+    ---@param self table
+    ---@param entry table
     define_preview = function(self, entry)
       -- add content
       local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
@@ -37,12 +40,15 @@ local function switcher()
     },
     sorter = conf.generic_sorter(),
 
+    ---@param prompt_bufnr NvBufnr
+    ---@return boolean
     attach_mappings = function(prompt_bufnr)
       -- reload theme while typing
       vim.schedule(function()
         vim.api.nvim_create_autocmd("TextChangedI", {
           buffer = prompt_bufnr,
-          callback = function()
+          ---@param _args NvAutocmdCallbackArgs
+          callback = function(_args)
             if action_state.get_selected_entry() then
               reload_theme(action_state.get_selected_entry()[1])
             end

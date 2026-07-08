@@ -1,6 +1,8 @@
 local M = {}
 local api = vim.api
 
+---@param triggerChars string[]
+---@return boolean?
 local function check_triggeredChars(triggerChars)
   local cur_line = api.nvim_get_current_line()
   local pos = api.nvim_win_get_cursor(0)[2]
@@ -14,6 +16,8 @@ local function check_triggeredChars(triggerChars)
   end
 end
 
+---@param client vim.lsp.Client
+---@param bufnr NvBufnr
 M.setup = function(client, bufnr)
   local group = api.nvim_create_augroup("LspSignature", { clear = false })
   api.nvim_clear_autocmds { group = group, buffer = bufnr }
@@ -23,7 +27,8 @@ M.setup = function(client, bufnr)
   api.nvim_create_autocmd("TextChangedI", {
     group = group,
     buffer = bufnr,
-    callback = function()
+    ---@param _args NvAutocmdCallbackArgs
+    callback = function(_args)
       if check_triggeredChars(triggerChars) then
         vim.lsp.buf.signature_help { focus = false, silent = true, max_height = 7, border = "single" }
       end

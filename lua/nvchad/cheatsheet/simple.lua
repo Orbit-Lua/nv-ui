@@ -12,13 +12,17 @@ local heading = {
 dofile(vim.g.base46_cache .. "nvcheatsheet")
 
 api.nvim_create_autocmd("BufWinLeave", {
-  callback = function()
+  ---@param _args NvAutocmdCallbackArgs
+  callback = function(_args)
     if vim.bo.ft == "nvcheatsheet" then
       vim.g.nvcheatsheet_displayed = false
     end
   end,
 })
 
+---@param buf? NvBufnr
+---@param win? NvWinid
+---@param action? NvUiAction
 return function(buf, win, action)
   action = action or "open"
 

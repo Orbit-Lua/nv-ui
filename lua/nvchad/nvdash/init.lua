@@ -2,20 +2,31 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 local strw = api.nvim_strwidth
+---@type NvDashConfig
 local opts = require("nvconfig").nvdash
 
+---@param keys string[]
+---@param action string|function
+---@param buf NvBufnr
 local map = function(keys, action, buf)
   for _, v in ipairs(keys) do
     vim.keymap.set("n", v, action, { buffer = buf })
   end
 end
 
+---@param txt1 string
+---@param txt2 string
+---@param max_str_w integer
+---@return string
 local function btn_gap(txt1, txt2, max_str_w)
   local btn_len = strw(txt1) + #txt2
   local spacing = max_str_w - btn_len
   return txt1 .. string.rep(" ", spacing) .. txt2
 end
 
+---@param tb NvDashButtonConfig
+---@param buf? NvBufnr
+---@return integer
 local multicolumn_strw = function(tb, buf)
   local pad = tb.pad or 0
   local c = 0 - pad
@@ -32,6 +43,10 @@ local multicolumn_strw = function(tb, buf)
   return c
 end
 
+---@param tb NvDashButtonConfig
+---@param total_w integer
+---@param virt_w integer
+---@return NvUiVirtLine
 local function multicolumn_virt_texts(tb, total_w, virt_w)
   local line = {}
 
@@ -46,6 +61,9 @@ local function multicolumn_virt_texts(tb, total_w, virt_w)
   return line
 end
 
+---@param buf? NvBufnr
+---@param win? NvWinid
+---@param action? NvUiAction
 M.open = function(buf, win, action)
   action = action or "open"
 
@@ -74,6 +92,7 @@ M.open = function(buf, win, action)
 
   opts.header = type(opts.header) == "function" and opts.header() or opts.header
 
+  ---@type table[]
   local ui = {}
 
   ------------------------ find largest string's width -----------------------------
@@ -90,8 +109,11 @@ M.open = function(buf, win, action)
 
   opts.buttons = type(opts.buttons) == "table" and opts.buttons or opts.buttons()
 
+  ---@type table<string, integer>
   local groups_maxw = {}
+  ---@type table<integer, integer>
   local btn_widths = {}
+  ---@type { i: integer, cmd: string, col: integer }[]
   local key_lines = {}
 
   for i, v in ipairs(opts.buttons) do
@@ -191,6 +213,9 @@ M.open = function(buf, win, action)
     api.nvim_win_set_cursor(win, { key_lines[1].i, key_lines[1].col })
   end
 
+  ---@param n integer
+  ---@param cmd boolean
+  ---@return integer[]?
   local key_movements = function(n, cmd)
     local curline = fn.line "."
 
@@ -226,7 +251,8 @@ M.open = function(buf, win, action)
   api.nvim_create_autocmd("BufWinLeave", {
     group = group_id,
     buffer = buf,
-    callback = function()
+    ---@param _args NvAutocmdCallbackArgs
+    callback = function(_args)
       vim.g.nvdash_displayed = false
       api.nvim_del_augroup_by_name "NvdashAu"
     end,
@@ -234,7 +260,8 @@ M.open = function(buf, win, action)
 
   api.nvim_create_autocmd({ "WinResized", "VimResized" }, {
     group = group_id,
-    callback = function()
+    ---@param _args NvAutocmdCallbackArgs
+    callback = function(_args)
       vim.bo[vim.g.nvdash_buf].ma = true
       require("nvchad.nvdash").open(vim.g.nvdash_buf, vim.g.nvdash_win, "redraw")
     end,

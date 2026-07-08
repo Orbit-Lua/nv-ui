@@ -1,7 +1,9 @@
 local M = {}
+---@type NvCmpConfig
 local ui = require("nvconfig").ui.cmp
 local atom_styled = ui.style == "atom" or ui.style == "atom_colored"
 
+---@type table[]
 local menu_cols
 if atom_styled or ui.icons_left then
   menu_cols = { { "kind_icon" }, { "label" }, { "kind" } }
@@ -12,6 +14,7 @@ end
 M.components = {
   kind_icon = {
     text = function(ctx)
+      ---@cast ctx NvBlinkContext
       local icons = require "nvchad.icons.lspkind"
       local icon = (icons[ctx.kind] or "󰈚")
 
@@ -25,6 +28,7 @@ M.components = {
 
   kind = {
     highlight = function(ctx)
+      ---@cast ctx NvBlinkContext
       return atom_styled and "comment" or ctx.kind
     end,
   },

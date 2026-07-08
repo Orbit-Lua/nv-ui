@@ -2,19 +2,22 @@ local M = {}
 local api = vim.api
 local state = require "nvchad.themes.state"
 
+---@param name string
+---@return Base16Table
 local get_theme_colors = function(name)
   local ok1, default_theme = pcall(require, "base46.themes." .. name)
   local _, user_theme = pcall(require, "themes." .. name)
   return (ok1 and default_theme or user_theme).base_16
 end
 
+---@return NvUiVirtLines
 M.compact = function()
   local result = {}
   local list = state.themes_shown
 
   for i = 1, #list, 1 do
     local name = list[i]
-    local theme_colors =  get_theme_colors(name)
+    local theme_colors = get_theme_colors(name)
     local theme_bg = theme_colors.base00
 
     local linehl = "NvT" .. i .. "line"
@@ -44,13 +47,14 @@ M.compact = function()
   return result
 end
 
+---@return NvUiVirtLines
 M.flat = function()
   local result = {}
   local list = state.themes_shown
 
   for i = 1, #list, 1 do
     local name = list[i]
-    local theme_colors =  get_theme_colors(name)
+    local theme_colors = get_theme_colors(name)
     local theme_bg = theme_colors.base00
 
     local linehl = "NvT" .. i .. "line"
@@ -84,6 +88,7 @@ M.flat = function()
   return result
 end
 
+---@return NvUiVirtLines
 M.bordered = function()
   local result = {}
   local list = state.themes_shown
@@ -91,7 +96,7 @@ M.bordered = function()
 
   for i = 1, #list, 1 do
     local name = list[i]
-    local theme_colors =  get_theme_colors(name)
+    local theme_colors = get_theme_colors(name)
 
     -- theme name + palette colors
     local padding = state.longest_name - #name + state.word_gap

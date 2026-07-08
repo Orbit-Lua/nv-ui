@@ -1,3 +1,4 @@
+---@type NvColorifyState
 local M = {
   events = {},
   ns = 1,

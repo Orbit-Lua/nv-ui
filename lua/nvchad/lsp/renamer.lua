@@ -1,6 +1,9 @@
 local lsp = vim.lsp
 local api = vim.api
 
+---@param range NvLspRange
+---@param position_encoding string
+---@return string
 local function get_text_at_range(range, position_encoding)
   return api.nvim_buf_get_text(
     0,
@@ -12,6 +15,7 @@ local function get_text_at_range(range, position_encoding)
   )[1]
 end
 
+---@param cb fun(symbol: string)
 local function get_symbol_to_rename(cb)
   local cword = vim.fn.expand "<cword>"
   local clients = lsp.get_clients { bufnr = 0, method = "textDocument/rename" }
@@ -32,6 +36,7 @@ local function get_symbol_to_rename(cb)
     local params = lsp.util.make_position_params(0, client.offset_encoding)
 
     client:request("textDocument/prepareRename", params, function(err, result, _, _)
+      ---@cast result NvLspPrepareRenameResult?
       if err or not result then
         cb(cword)
       end

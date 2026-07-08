@@ -4,6 +4,7 @@ local api = vim.api
 local state = require "nvchad.colorify.state"
 state.ns = api.nvim_create_namespace "Colorify"
 
+---@type fun(buf: NvBufnr, event: string)
 M.attach = require "nvchad.colorify.attach"
 
 M.run = function()
@@ -16,6 +17,7 @@ M.run = function()
     "WinScrolled",
     "BufEnter",
   }, {
+    ---@param args NvAutocmdCallbackArgs
     callback = function(args)
       if vim.bo[args.buf].bl then
         M.attach(args.buf, args.event)

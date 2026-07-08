@@ -1,8 +1,11 @@
 local M = {}
 local masonames = require "nvchad.mason.names"
+---@type string[]
 local pkgs = require("nvconfig").mason.pkgs
+---@type string[]
 local skipped = require("nvconfig").mason.skip
 
+---@return string[]
 M.get_pkgs = function()
   local tools = {}
 
@@ -41,6 +44,8 @@ M.get_pkgs = function()
   return pkgs
 end
 
+---@param package_name string
+---@return NvMasonPackageSpec
 local function parse_package(package_name)
   local name, version = package_name:match "^([^@]+)@?(.*)$"
   return {

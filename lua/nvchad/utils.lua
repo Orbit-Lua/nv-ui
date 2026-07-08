@@ -3,6 +3,7 @@ local fn = vim.fn
 local opt_local = vim.api.nvim_set_option_value
 local base46_path = vim.fn.fnamemodify(debug.getinfo(require("base46").merge_tb, "S").source:sub(2), ":p:h")
 
+---@return string[]
 M.list_themes = function()
   local default_themes = vim.fn.readdir(base46_path .. "/themes")
   local custom_themes = vim.uv.fs_stat(fn.stdpath "config" .. "/lua/themes")
@@ -21,6 +22,9 @@ M.list_themes = function()
   return default_themes
 end
 
+---@param old string
+---@param new string
+---@param filepath? string
 M.replace_word = function(old, new, filepath)
   filepath = filepath or vim.fn.stdpath "config" .. "/lua/" .. "chadrc.lua"
 
@@ -35,6 +39,8 @@ M.replace_word = function(old, new, filepath)
   end
 end
 
+---@param ft string
+---@param buf NvBufnr
 M.set_cleanbuf_opts = function(ft, buf)
   opt_local("buflisted", false, { buf = buf })
   opt_local("modifiable", false, { buf = buf })
@@ -50,6 +56,7 @@ M.set_cleanbuf_opts = function(ft, buf)
   vim.g[ft .. "_displayed"] = true
 end
 
+---@param module? string
 M.reload = function(module)
   if module then
     require("plenary.reload").reload_module(module)

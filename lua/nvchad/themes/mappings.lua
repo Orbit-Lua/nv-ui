@@ -5,6 +5,10 @@ local redraw = require("volt").redraw
 local utils = require "nvchad.themes.utils"
 local nvapi = require "nvchad.themes.api"
 
+---@param mode string|string[]
+---@param keys string[]
+---@param func string|function
+---@param opts? vim.keymap.set.Opts
 local map = function(mode, keys, func, opts)
   for _, key in ipairs(keys) do
     vim.keymap.set(mode, key, func, opts)
@@ -40,7 +44,8 @@ api.nvim_win_set_cursor(state.input_win, { 1, 6 })
 autocmd("TextChangedI", {
   buffer = state.input_buf,
 
-  callback = function()
+  ---@param _args NvAutocmdCallbackArgs
+  callback = function(_args)
     if state.scrolled then
       api.nvim_buf_call(state.buf, function()
         vim.cmd "normal! gg"

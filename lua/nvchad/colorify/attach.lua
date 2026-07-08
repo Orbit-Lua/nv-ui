@@ -6,11 +6,18 @@ local ns = require("nvchad.colorify.state").ns
 local get_extmarks = api.nvim_buf_get_extmarks
 local methods = require "nvchad.colorify.methods"
 
+---@param buf NvBufnr
 local del_extmarks_on_textchange = function(buf)
   vim.b[buf].colorify_attached = true
 
   api.nvim_buf_attach(buf, false, {
     -- s = start, e == end
+    ---@param b NvBufnr
+    ---@param s_row integer
+    ---@param s_col integer
+    ---@param old_e_row integer
+    ---@param old_e_col integer
+    ---@param new_e_col integer
     on_bytes = function(_, b, _, s_row, s_col, _, old_e_row, old_e_col, _, _, new_e_col, _)
       -- old_e_row = old deleted lines!
       -- new_e_col isnt 0 when cursor pos has changed
@@ -42,6 +49,8 @@ local del_extmarks_on_textchange = function(buf)
   })
 end
 
+---@param buf NvBufnr
+---@param event string
 return function(buf, event)
   local winid = vim.fn.bufwinid(buf)
 

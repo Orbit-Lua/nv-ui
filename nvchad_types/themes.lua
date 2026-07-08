@@ -1,9 +1,9 @@
 ---@meta
 --- Don't edit or require this file
-error("Requiring a meta file")
+error "Requiring a meta file"
 
 ---@type ThemeName
-vim.g.nvchad_theme = 'onedark'
+vim.g.nvchad_theme = "onedark"
 
 ---@alias ThemeName
 ---| '"zenburn"'

@@ -26,6 +26,7 @@ local gen_word_pad = function()
   state.longest_name = largest
 end
 
+---@param opts? NvThemePickerOpts
 M.open = function(opts)
   opts = opts or {}
   state.buf = api.nvim_create_buf(false, true)

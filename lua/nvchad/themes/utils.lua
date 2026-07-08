@@ -1,5 +1,8 @@
 local M = {}
 
+---@param tb string[]
+---@param str string
+---@return string[]
 M.filter = function(tb, str)
   local strlen = #str
   local result = {}
@@ -19,6 +22,7 @@ M.filter = function(tb, str)
   return #result == 0 and tb or result
 end
 
+---@param name string
 M.reload_theme = function(name)
   require("nvconfig").base46.theme = name
   require("base46").load_all_highlights()
