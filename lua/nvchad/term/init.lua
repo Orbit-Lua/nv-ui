@@ -3,8 +3,10 @@ local g = vim.g
 local M = {}
 local set_buf = api.nvim_set_current_buf
 
+---@type table<string, NvTermOptions>
 g.nvchad_terms = {}
 
+---@type table<NvTermPosition, NvTermPositionData>
 local pos_data = {
   sp = { resize = "height", area = "lines" },
   vsp = { resize = "width", area = "columns" },
@@ -13,6 +15,7 @@ local pos_data = {
 }
 
 local nvconfig = require "nvconfig"
+---@type TermConfig
 local config = nvconfig.term
 
 if config.base46_colors then
@@ -24,12 +27,16 @@ vim.g.nvhterm = false
 vim.g.nvvterm = false
 
 -------------------------- util funcs -----------------------------
+---@param index NvBufnr|string|integer
+---@param val? NvTermOptions
 local function save_term_info(index, val)
   local terms_list = g.nvchad_terms
   terms_list[tostring(index)] = val
   g.nvchad_terms = terms_list
 end
 
+---@param id string|integer|nil
+---@return NvTermOptions?
 local function opts_to_id(id)
   for _, opts in pairs(g.nvchad_terms) do
     if opts.id == id then
@@ -38,6 +45,8 @@ local function opts_to_id(id)
   end
 end
 
+---@param buffer NvBufnr
+---@param float_opts? TermFloat
 local function create_float(buffer, float_opts)
   local opts = vim.tbl_deep_extend("force", config.float, float_opts or {})
 
@@ -49,10 +58,47 @@ local function create_float(buffer, float_opts)
   vim.api.nvim_open_win(buffer, true, opts)
 end
 
+---@param cmd NvTermCommand
+---@return string
 local function format_cmd(cmd)
   return type(cmd) == "string" and cmd or cmd()
 end
 
+---@return string[]
+local function split_shellcmdflag()
+  return vim.split(vim.o.shellcmdflag, "%s+", { plain = false, trimempty = true })
+end
+
+---@return string
+local function shell_name()
+  local name = vim.fn.fnamemodify(vim.o.shell, ":t"):lower()
+  local shell = name:gsub("%.exe$", "")
+
+  return shell
+end
+
+---@param opts NvTermOptions
+---@return string[]
+local function terminal_cmd(opts)
+  local shell = vim.o.shell
+
+  if opts.cmd then
+    local cmd = { shell }
+
+    vim.list_extend(cmd, split_shellcmdflag())
+    table.insert(cmd, format_cmd(opts.cmd))
+
+    return cmd
+  end
+
+  if vim.fn.has "win32" == 1 and vim.tbl_contains({ "powershell", "pwsh" }, shell_name()) then
+    return { shell, "-NoLogo" }
+  end
+
+  return { shell }
+end
+
+---@param opts NvTermOptions
 M.display = function(opts)
   if opts.pos == "float" then
     create_float(opts.buf, opts.float_opts)
@@ -89,27 +135,19 @@ M.display = function(opts)
   save_term_info(opts.buf, opts)
 end
 
+---@param opts NvTermOptions
 local function create(opts)
   local buf_exists = opts.buf
   opts.buf = opts.buf or vim.api.nvim_create_buf(false, true)
-
-  -- handle cmd opt
-  local shell = vim.o.shell
-  local cmd = shell
-
-  if opts.cmd and opts.buf then
-    cmd = { shell, "-c", format_cmd(opts.cmd) .. "; " .. shell }
-  else
-    cmd = { shell }
-  end
+  local cmd = terminal_cmd(opts)
 
   M.display(opts)
 
   save_term_info(opts.buf, opts)
 
-  opts.termopen_opts = vim.tbl_extend("force", opts.termopen_opts or {}, { detach = false })
   if not buf_exists then
-    vim.fn.termopen(cmd, opts.termopen_opts)
+    opts.termopen_opts = vim.tbl_extend("force", opts.termopen_opts or {}, { detach = false, term = true })
+    vim.fn.jobstart(cmd, opts.termopen_opts)
   end
 
   vim.g.nvhterm = opts.pos == "sp"
@@ -117,10 +155,12 @@ local function create(opts)
 end
 
 --------------------------- user api -------------------------------
+---@param opts NvTermOptions
 M.new = function(opts)
   create(opts)
 end
 
+---@param opts NvTermOptions
 M.toggle = function(opts)
   local x = opts_to_id(opts.id)
   opts.buf = x and x.buf or nil
@@ -133,6 +173,7 @@ M.toggle = function(opts)
 end
 
 -- spawns term with *cmd & runs the *cmd if the keybind is run again
+---@param opts NvTermOptions
 M.runner = function(opts)
   local x = opts_to_id(opts.id)
   local clear_cmd = opts.clear_cmd or "clear; "
@@ -162,6 +203,7 @@ end
 
 --------------------------- autocmds -------------------------------
 api.nvim_create_autocmd("TermClose", {
+  ---@param args NvAutocmdCallbackArgs
   callback = function(args)
     save_term_info(args.buf, nil)
   end,

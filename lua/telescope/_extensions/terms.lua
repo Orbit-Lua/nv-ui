@@ -9,6 +9,7 @@ local actions = require "telescope.actions"
 local make_entry = require "telescope.make_entry"
 local action_state = require "telescope.actions.state"
 
+---@return table<string, table>
 local get_general_terms = function()
   local bufs = vim.api.nvim_list_bufs()
   local nvterms = vim.g.nvchad_terms or {}
@@ -54,6 +55,8 @@ local function wrapper()
     },
     sorter = conf.generic_sorter(),
 
+    ---@param prompt_bufnr NvBufnr
+    ---@return boolean
     attach_mappings = function(prompt_bufnr)
       actions.select_default:replace(function()
         local entry = action_state.get_selected_entry()
