@@ -1,3 +1,4 @@
+---@type NvTabLineConfig
 local opts = require("nvconfig").ui.tabufline
 local api = vim.api
 local get_opt = api.nvim_get_option_value
@@ -13,6 +14,7 @@ vim.t.bufs = vim.t.bufs
 -- autocmds for tabufline -> store bufnrs on bufadd, bufenter events
 -- thx to https://github.com/ii14 & stores buffer per tab -> table
 autocmd({ "BufAdd", "BufEnter", "tabnew" }, {
+  ---@param args NvAutocmdCallbackArgs
   callback = function(args)
     local bufs = vim.t.bufs
     local is_curbuf = cur_buf() == args.buf
@@ -43,6 +45,7 @@ autocmd({ "BufAdd", "BufEnter", "tabnew" }, {
 })
 
 autocmd("BufDelete", {
+  ---@param args NvAutocmdCallbackArgs
   callback = function(args)
     for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
       local bufs = vim.t[tab].bufs
@@ -63,7 +66,8 @@ if opts.lazyload then
   vim.api.nvim_create_autocmd({ "BufNew", "BufNewFile", "BufRead", "TabEnter", "TermOpen" }, {
     pattern = "*",
     group = vim.api.nvim_create_augroup("TabuflineLazyLoad", {}),
-    callback = function()
+    ---@param _args NvAutocmdCallbackArgs
+    callback = function(_args)
       if #vim.fn.getbufinfo { buflisted = 1 } >= 2 or #vim.api.nvim_list_tabpages() >= 2 then
         vim.o.showtabline = 2
         vim.o.tabline = "%!v:lua.require('nvchad.tabufline.modules')()"
@@ -80,7 +84,8 @@ end
 
 autocmd("FileType", {
   pattern = "qf",
-  callback = function()
+  ---@param _args NvAutocmdCallbackArgs
+  callback = function(_args)
     vim.opt_local.buflisted = false
   end,
 })

@@ -4,6 +4,8 @@ local cur_buf = api.nvim_get_current_buf
 local set_buf = api.nvim_set_current_buf
 local get_opt = api.nvim_get_option_value
 
+---@param bufnr NvBufnr
+---@return integer?
 local function buf_index(bufnr)
   for i, value in ipairs(vim.t.bufs) do
     if value == bufnr then
@@ -36,6 +38,7 @@ M.prev = function()
   set_buf((curbufIndex == 1 and bufs[#bufs]) or bufs[curbufIndex - 1])
 end
 
+---@param bufnr? NvBufnr
 M.close_buffer = function(bufnr)
   bufnr = bufnr or cur_buf()
 
@@ -79,6 +82,7 @@ M.close_buffer = function(bufnr)
 end
 
 -- closes tab + all of its buffers
+---@param include_cur_buf? boolean
 M.closeAllBufs = function(include_cur_buf)
   local bufs = vim.t.bufs
 
@@ -92,6 +96,7 @@ M.closeAllBufs = function(include_cur_buf)
 end
 
 -- closes all other buffers right or left
+---@param x '"left"'|'"right"'
 M.closeBufs_at_direction = function(x)
   local buf_i = buf_index(cur_buf())
 
@@ -102,6 +107,7 @@ M.closeBufs_at_direction = function(x)
   end
 end
 
+---@param n -1|1
 M.move_buf = function(n)
   local bufs = vim.t.bufs
 
@@ -121,6 +127,7 @@ M.move_buf = function(n)
   vim.cmd "redrawtabline"
 end
 
+---@param bufnr NvBufnr
 M.goto_buf = function(bufnr)
   local cur_win = api.nvim_get_current_win()
   local fixedbuf = api.nvim_get_option_value("winfixbuf", { win = cur_win })

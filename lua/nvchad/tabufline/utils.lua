@@ -5,19 +5,30 @@ local strep = string.rep
 local cur_buf = api.nvim_get_current_buf
 local buf_name = api.nvim_buf_get_name
 local get_hl = api.nvim_get_hl
+local icons_utils = require "nvchad.icons.utils"
 
+---@param str? string
+---@param hl string
+---@return string
 M.txt = function(str, hl)
   str = str or ""
   local a = "%#Tb" .. hl .. "#" .. str
   return a
 end
 
+---@param str string
+---@param hl? string
+---@param func string
+---@param arg? string|integer
+---@return string
 M.btn = function(str, hl, func, arg)
   str = hl and M.txt(str, hl) or str
   arg = arg or ""
   return "%" .. arg .. "@Tb" .. func .. "@" .. str .. "%X"
 end
 
+---@param str string
+---@return string?
 local function filename(str)
   return str:match "([^/\\]+)[/\\]*$"
 end
@@ -25,13 +36,21 @@ end
 local btn = M.btn
 local txt = M.txt
 
+---@param group1 string
+---@param group2 string
+---@return string
 local function new_hl(group1, group2)
-  local fg = get_hl(0, { name = group1 }).fg
+  local fg = get_hl(0, { name = group1, link = false }).fg
+    or get_hl(0, { name = "DevIconDefault", link = false }).fg
+    or get_hl(0, { name = "Normal", link = false }).fg
   local bg = get_hl(0, { name = "Tb" .. group2 }).bg
   api.nvim_set_hl(0, group1 .. group2, { fg = fg, bg = bg })
   return "%#" .. group1 .. group2 .. "#"
 end
 
+---@param name string
+---@param index integer
+---@return string?
 local function gen_unique_name(name, index)
   for i2, nr2 in ipairs(vim.t.bufs) do
     local filepath = filename(buf_name(nr2))
@@ -41,6 +60,10 @@ local function gen_unique_name(name, index)
   end
 end
 
+---@param nr NvBufnr
+---@param i integer
+---@param w integer
+---@return string
 M.style_buf = function(nr, i, w)
   -- add fileicon + name
   local icon = "󰈚 "
@@ -52,11 +75,11 @@ M.style_buf = function(nr, i, w)
   name = name and (gen_unique_name(name, i) or name) or " No Name "
 
   if name ~= " No Name " then
-    local devicon, devicon_hl = require("nvim-web-devicons").get_icon(name)
+    local devicon, devicon_hl = icons_utils.get_file_icon_data(name)
 
     if devicon then
       icon = " " .. devicon .. " "
-      icon_hl = new_hl(devicon_hl, tbHlName)
+      icon_hl = new_hl(devicon_hl or "DevIconDefault", tbHlName)
     end
   end
 
