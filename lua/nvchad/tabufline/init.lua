@@ -42,11 +42,15 @@ end
 M.close_buffer = function(bufnr)
   bufnr = bufnr or cur_buf()
 
+  if not api.nvim_buf_is_valid(bufnr) then
+    return
+  end
+
   if vim.bo[bufnr].buftype == "terminal" then
-    vim.cmd(vim.bo.buflisted and "set nobl | enew" or "hide")
+    vim.cmd(vim.bo[bufnr].buflisted and "set nobl | enew" or "hide")
   else
     local curBufIndex = buf_index(bufnr)
-    local bufhidden = vim.bo.bufhidden
+    local bufhidden = vim.bo[bufnr].bufhidden
 
     -- force close floating wins or nonbuflisted
     if api.nvim_win_get_config(0).zindex then
@@ -59,22 +63,39 @@ M.close_buffer = function(bufnr)
       vim.cmd("b" .. vim.t.bufs[curBufIndex + newBufIndex])
 
       -- handle unlisted
-    elseif not vim.bo.buflisted then
-      local tmpbufnr = vim.t.bufs[1]
-      if tmpbufnr then
-        local winid = vim.fn.bufwinid(tmpbufnr)
-        winid = winid ~= -1 and winid or 0
-        api.nvim_set_current_win(winid)
-        api.nvim_set_current_buf(tmpbufnr)
+    elseif not vim.bo[bufnr].buflisted then
+      if cur_buf() == bufnr then
+        for _, tmpbufnr in ipairs(vim.t.bufs) do
+          if tmpbufnr ~= bufnr and api.nvim_buf_is_valid(tmpbufnr) and vim.bo[tmpbufnr].buflisted then
+            local winid = vim.fn.bufwinid(tmpbufnr)
+            if winid ~= -1 then
+              api.nvim_set_current_win(winid)
+            end
+            api.nvim_set_current_buf(tmpbufnr)
+            break
+          end
+        end
+
+        if cur_buf() == bufnr then
+          api.nvim_set_current_buf(api.nvim_create_buf(true, false))
+        end
       end
-      vim.cmd("bw" .. bufnr)
+
+      if api.nvim_buf_is_valid(bufnr) then
+        local ok, err = pcall(api.nvim_buf_delete, bufnr, { force = false })
+        if not ok and not tostring(err):match "Invalid buffer" then
+          error(err)
+        end
+      end
+
+      vim.cmd "redrawtabline"
       return
     else
       vim.cmd "enew"
     end
 
-    if not (bufhidden == "delete") then
-      vim.cmd("confirm bd" .. bufnr)
+    if api.nvim_buf_is_valid(bufnr) and (bufhidden ~= "delete" or api.nvim_buf_is_loaded(bufnr)) then
+      vim.cmd("confirm bd " .. bufnr)
     end
   end
 
