@@ -91,18 +91,42 @@ M.lsp = function()
   return "%#St_Lsp#" .. utils.lsp()
 end
 
----@return string
-M.copilot = function()
-  if rawget(vim, "lsp") then
-    for _, client in ipairs(vim.lsp.get_clients()) do
-      if client.attached_buffers[utils.stbufnr()] and client.name == "copilot" then
-        return "%#St_copilot#" .. "  "
-      end
+---@param bufnr integer
+---@return boolean
+local function has_copilot(bufnr)
+  if not rawget(vim, "lsp") then
+    return false
+  end
+
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    if client.name == "copilot" and client.attached_buffers and client.attached_buffers[bufnr] then
+      return true
     end
   end
 
-  return ""
+  return false
 end
+
+---@return string
+M.ai = function()
+  local ai = config.ai or {}
+  local bufnr = utils.stbufnr()
+  local available = has_copilot(bufnr)
+
+  if not available and type(ai.is_available) == "function" then
+    local ok, result = pcall(ai.is_available, bufnr)
+    available = ok and result
+  end
+
+  if not available then
+    return ""
+  end
+
+  return "%#" .. (ai.hl or "St_copilot") .. "#" .. (ai.icon or "  ")
+end
+
+-- Compatibility alias for custom statusline orders using the old module name.
+M.copilot = M.ai
 
 ---@return string
 M.file_path = function()

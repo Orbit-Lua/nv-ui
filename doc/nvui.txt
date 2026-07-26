@@ -157,6 +157,10 @@ nvconfig file : |https://github.com/NvChad/ui/blob/v3.0/lua/nvconfig.lua|
        separator_style = "default",
        order = nil,
        modules = nil,
+       ai = {
+         icon = "  ",
+         hl = "St_copilot",
+       },
      },
  
      -- lazyload it when there are 1+ buffers
@@ -320,11 +324,17 @@ Managing modules example: ~
        git = false,
        lsp_msg = false,
      },
+     ai = {
+       icon = "  ",
+       hl = "St_copilot",
+       is_available = function(bufnr)
+         return require("my_completion").is_available(bufnr)
+       end,
+     },
      modules = {
        abc = function()
          return "hi"
        end,
-
        xyz =  "hi",
        f = "%F"
      }
@@ -337,6 +347,13 @@ Note:  The |"%F"| is a stl modifier, check `stl` to know list of modifiers
  - The module can be a string/function
  - |"%="| is a separator, modules before 1st separator will be on the left 
         and after the last separator on the right
+
+ai: ~
+  - Configures the default theme's AI completion indicator.
+  - Copilot LSP clients are detected automatically.
+  - `is_available(bufnr)` can report additional completion providers.
+  - `icon` and `hl` customize the displayed icon and highlight group.
+  - The legacy `copilot` module name remains available for custom orders.
 
 theme: ~
    |values| = default, vscode, vscode_colored, minimal

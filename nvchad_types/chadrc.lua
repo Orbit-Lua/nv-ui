@@ -98,8 +98,15 @@
 ---     }
 --- ```
 ---@field modules? table<string, string | fun(): string>
+--- AI completion indicator. The callback augments the built-in Copilot LSP check.
+---@field ai? NvStatusLineAIConfig
 ---if symbols or file_path tokens exceed truncation_length, they will be truncated to truncation_length chars with "…"
 ---@field truncation_length? number
+
+---@class NvStatusLineAIConfig
+---@field icon? string
+---@field hl? string
+---@field is_available? fun(bufnr: integer): boolean
 
 --- Maximum length for the progress messages section
 --- Options for NvChad Tabufline

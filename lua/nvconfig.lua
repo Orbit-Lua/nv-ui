@@ -31,6 +31,10 @@ local options = {
       order = nil,
       enabled_modules = nil,
       modules = nil,
+      ai = {
+        icon = "  ",
+        hl = "St_copilot",
+      },
       -- for symbols, file_path
       truncation_length = 3,
     },
