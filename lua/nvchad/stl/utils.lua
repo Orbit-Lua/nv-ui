@@ -22,7 +22,7 @@ local default_order = {
   "lsp_msg",
   "%=",
   "diagnostics",
-  "copilot",
+  "ai",
   "lsp",
   "cwd",
   "cursor",
@@ -39,7 +39,7 @@ local default_order_no_lsp_msg = {
   "%=",
   "%=",
   "diagnostics",
-  "copilot",
+  "ai",
   "lsp",
   "cwd",
   "cursor",
@@ -84,10 +84,21 @@ M.generate = function(theme, modules)
     for key, value in pairs(config.modules) do
       modules[key] = value
     end
+
+    if config.modules.ai == nil and config.modules.copilot ~= nil and modules.ai then
+      modules.ai = config.modules.copilot
+    elseif config.modules.ai ~= nil and config.modules.copilot == nil and modules.copilot then
+      modules.copilot = config.modules.ai
+    end
   end
 
   for _, v in ipairs(order) do
-    if enabled_modules == nil or enabled_modules[v] ~= false then
+    local enabled = enabled_modules == nil or enabled_modules[v] ~= false
+    if v == "ai" and enabled_modules and enabled_modules.ai == nil and enabled_modules.copilot == false then
+      enabled = false
+    end
+
+    if enabled then
       local module = modules[v]
       module = type(module) == "string" and module or module()
       table.insert(result, module)
