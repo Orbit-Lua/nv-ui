@@ -1,3 +1,4 @@
+---@type ChadrcConfig
 local options = {
 
   base46 = {
@@ -30,7 +31,10 @@ local options = {
       -- round and block will work for minimal theme only
       separator_style = "default",
       order = nil,
+      enabled_modules = nil,
       modules = nil,
+      -- for symbols, file_path
+      truncation_length = 3,
     },
 
     -- lazyload it when there are 1+ buffers
@@ -126,4 +130,6 @@ local options = {
 }
 
 local status, chadrc = pcall(require, "chadrc")
+---@cast chadrc ChadrcConfig
+---@type ChadrcConfig
 return vim.tbl_deep_extend("force", options, status and chadrc or {})

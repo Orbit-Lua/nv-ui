@@ -2,6 +2,8 @@ local M = {}
 local api = vim.api
 local state = require "nvchad.themes.state"
 
+---@param name string
+---@return Base16Table
 local get_theme_colors = function(name)
   local ok, theme = pcall(require, "base46.themes." .. name)
 
@@ -34,6 +36,7 @@ local theme_hls = function(name, with_bg)
   return prefix
 end
 
+---@return NvUiVirtLines
 M.compact = function()
   local result = {}
   local list = state.themes_shown
@@ -63,6 +66,7 @@ M.compact = function()
   return result
 end
 
+---@return NvUiVirtLines
 M.flat = function()
   local result = {}
   local list = state.themes_shown
@@ -96,6 +100,7 @@ M.flat = function()
   return result
 end
 
+---@return NvUiVirtLines
 M.bordered = function()
   local result = {}
   local list = state.themes_shown

@@ -1,3 +1,4 @@
+---@type NvThemePickerState
 local M = {
   scrolled = false,
   textchanged = false,

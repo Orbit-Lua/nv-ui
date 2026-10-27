@@ -3,6 +3,8 @@ local state = require "nvchad.themes.state"
 local redraw = require("volt").redraw
 local utils = require "nvchad.themes.utils"
 
+---@param n -1|1
+---@return string
 local set_index = function(n)
   local list = state.themes_shown
 
@@ -16,6 +18,8 @@ local set_index = function(n)
   return state.active_theme
 end
 
+---@param n integer
+---@param direction '"up"'|'"down"'
 local function scroll(n, direction)
   if direction == "up" then
     vim.cmd("normal!" .. n .. "")

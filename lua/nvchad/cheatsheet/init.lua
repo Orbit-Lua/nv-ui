@@ -1,11 +1,16 @@
 local M = {}
 local api = vim.api
+---@type ChadrcConfig
 local config = require "nvconfig"
 
+---@param str string
+---@return string
 local function capitalize(str)
   return (str:gsub("^%l", string.upper))
 end
 
+---@param mappings NvCheatsheetKeymap[]
+---@param tb_to_add NvCheatsheetMappings
 M.get_mappings = function(mappings, tb_to_add)
   local excluded_groups = require("nvconfig").cheatsheet.excluded_groups
 
@@ -46,6 +51,7 @@ M.get_mappings = function(mappings, tb_to_add)
   end
 end
 
+---@return NvCheatsheetMappings
 M.organize_mappings = function()
   local tb_to_add = {}
   local modes = { "n", "i", "v", "t" }
@@ -113,6 +119,7 @@ M.render = function(buf, rows)
   vim.bo[buf].ma = false
 end
 
+---@param buf NvBufnr
 M.autocmds = function(buf)
   require("nvchad.utils").set_cleanbuf_opts("nvcheatsheet", buf)
 
@@ -121,7 +128,8 @@ M.autocmds = function(buf)
   api.nvim_create_autocmd("BufWinLeave", {
     group = group_id,
     buffer = buf,
-    callback = function()
+    ---@param _args NvAutocmdCallbackArgs
+    callback = function(_args)
       vim.g.nvcheatsheet_displayed = false
       api.nvim_del_augroup_by_name "NvCh"
     end,
@@ -129,7 +137,8 @@ M.autocmds = function(buf)
 
   api.nvim_create_autocmd({ "WinResized", "VimResized" }, {
     group = group_id,
-    callback = function()
+    ---@param _args NvAutocmdCallbackArgs
+    callback = function(_args)
       require("nvchad.cheatsheet." .. config.cheatsheet.theme)(vim.g.nvch_buf, vim.g.nvch_win, "redraw")
     end,
   })
@@ -149,6 +158,7 @@ M.autocmds = function(buf)
   vim.g.nvch_win = vim.fn.bufwinid(buf)
 end
 
+---@return string
 M.rand_hlgroup = function()
   local hlgroups =
     { "blue", "red", "green", "yellow", "orange", "baby_pink", "purple", "white", "cyan", "vibrant_green", "teal" }
@@ -156,6 +166,7 @@ M.rand_hlgroup = function()
   return "NvChHead" .. hlgroups[math.random(1, #hlgroups)]
 end
 
+---@type { mappings_tb: NvCheatsheetMappings }
 M.state = {
   mappings_tb = {},
 }

@@ -1,5 +1,6 @@
 local api = vim.api
 
+---@param lines NvUiTextChunk[]
 return function(lines)
   local w = 0
 
@@ -15,8 +16,8 @@ return function(lines)
     end
   end
 
-  table.insert(lines, 1, { '' })
-  table.insert(lines,  { '' })
+  table.insert(lines, 1, { "" })
+  table.insert(lines, { "" })
 
   local buf = api.nvim_create_buf(false, true)
 
@@ -28,11 +29,11 @@ return function(lines)
     relative = "editor",
     style = "minimal",
     border = "single",
-    title={{"  NvChad News ", "healthSuccess"}},
+    title = { { "  NvChad News ", "healthSuccess" } },
     title_pos = "center",
   })
 
-   vim.wo[win].winhl = "FloatBorder:Comment"
+  vim.wo[win].winhl = "FloatBorder:Comment"
 
   for i, line in ipairs(lines) do
     vim.api.nvim_buf_set_lines(buf, i - 1, i, false, { line[1] })

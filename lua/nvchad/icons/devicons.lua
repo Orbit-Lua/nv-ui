@@ -1,3 +1,4 @@
+---@type table<string, { icon: string, name: string }>
 return {
   default_icon = { icon = "󰈚", name = "Default" },
   js = { icon = "󰌞", name = "js" },

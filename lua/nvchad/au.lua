@@ -1,4 +1,5 @@
 local autocmd = vim.api.nvim_create_autocmd
+---@type ChadrcConfig
 local config = require "nvconfig"
 
 -- load nvdash only on empty file
@@ -16,6 +17,7 @@ end
 
 if config.lsp.signature then
   autocmd("LspAttach", {
+    ---@param args NvAutocmdCallbackArgs
     callback = function(args)
       vim.schedule(function()
         local client = vim.lsp.get_client_by_id(args.data.client_id)
@@ -38,6 +40,7 @@ autocmd("BufWritePost", {
   end, vim.fn.glob(vim.fn.stdpath "config" .. "/lua/**/*.lua", true, true, true)),
   group = vim.api.nvim_create_augroup("ReloadNvChad", {}),
 
+  ---@param opts NvAutocmdCallbackArgs
   callback = function(opts)
     local fp = vim.fn.fnamemodify(vim.fs.normalize(vim.api.nvim_buf_get_name(opts.buf)), ":r") --[[@as string]]
     local app_name = vim.env.NVIM_APPNAME and vim.env.NVIM_APPNAME or "nvim"

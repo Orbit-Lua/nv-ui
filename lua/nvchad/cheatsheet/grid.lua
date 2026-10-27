@@ -15,6 +15,9 @@ local ascii = {
   "                                      ",
 }
 
+---@param buf? NvBufnr
+---@param win? NvWinid
+---@param action? NvUiAction
 return function(buf, win, action)
   action = action or "open"
 

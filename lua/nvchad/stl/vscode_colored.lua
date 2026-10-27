@@ -1,7 +1,9 @@
 local utils = require "nvchad.stl.utils"
 
+---@type NvStatuslineModule
 local M = {}
 
+---@return string
 M.mode = function()
   if not utils.is_activewin() then
     return ""
@@ -12,6 +14,7 @@ M.mode = function()
   return "%#St_" .. modes[m][2] .. "mode#" .. "  " .. modes[m][1] .. " "
 end
 
+---@return string
 M.file = function()
   local x = utils.file()
   local name = " " .. x[2] .. " "
@@ -22,6 +25,7 @@ M.git = utils.git
 M.lsp_msg = utils.lsp_msg
 M.diagnostics = utils.diagnostics
 
+---@return string
 M.lsp = function()
   return "%#St_Lsp#" .. utils.lsp()
 end
@@ -29,12 +33,14 @@ end
 M.cursor = "%#StText# Ln %l, Col %v "
 M["%="] = "%="
 
+---@return string
 M.cwd = function()
   local name = vim.uv.cwd()
   name = "%#St_cwd# 󰉖 " .. (name:match "([^/\\]+)[/\\]*$" or name) .. " "
   return (vim.o.columns > 85 and name) or ""
 end
 
+---@return string
 return function()
   return utils.generate("vscode", M)
 end

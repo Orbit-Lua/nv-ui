@@ -1,3 +1,4 @@
+---@type NvCmpConfig
 local cmp_ui = require("nvconfig").ui.cmp
 local cmp_style = cmp_ui.style
 local format_color = require "nvchad.cmp.format"
@@ -7,6 +8,9 @@ local fields = (atom_styled or cmp_ui.icons_left) and { "kind", "abbr", "menu" }
 
 local M = {
   formatting = {
+    ---@param entry NvCmpEntry
+    ---@param item NvCmpCompletionItem
+    ---@return NvCmpCompletionItem
     format = function(entry, item)
       local icons = require "nvchad.icons.lspkind"
       local icon = icons[item.kind] or ""

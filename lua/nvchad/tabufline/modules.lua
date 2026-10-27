@@ -7,8 +7,10 @@ local btn = require("nvchad.tabufline.utils").btn
 local strep = string.rep
 local style_buf = require("nvchad.tabufline.utils").style_buf
 local cur_buf = api.nvim_get_current_buf
+---@type NvTabLineConfig
 local opts = require("nvconfig").ui.tabufline
 
+---@type NvTabuflineModule
 local M = {}
 g.toggle_theme_icon = "   "
 
@@ -32,6 +34,7 @@ vim.cmd "function! TbToggleTabs(a,b,c,d) \n let g:TbTabsToggled = !g:TbTabsToggl
 
 ---------------------------------- functions -------------------------------------------
 
+---@return integer
 local function getFileTreeWidth()
   for _, win in pairs(api.nvim_tabpage_list_wins(0)) do
     if vim.bo[api.nvim_win_get_buf(win)].ft == opts.treeOffsetFt then
@@ -41,6 +44,7 @@ local function getFileTreeWidth()
   return 0
 end
 
+---@return integer
 local function available_space()
   local str = ""
 

@@ -2,6 +2,7 @@
 --  TO use this put this in your plugins table
 -- { import = "nvchad.blink.lazyspec" },
 
+---@type NvPluginSpec[]
 return {
   {
     "hrsh7th/nvim-cmp",

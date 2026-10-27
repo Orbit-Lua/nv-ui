@@ -3,8 +3,10 @@ local g = vim.g
 local M = {}
 local set_buf = api.nvim_set_current_buf
 
+---@type table<string, NvTermOptions>
 g.nvchad_terms = {}
 
+---@type table<NvTermPosition, NvTermPositionData>
 local pos_data = {
   sp = { resize = "height", area = "lines" },
   vsp = { resize = "width", area = "columns" },
@@ -13,6 +15,7 @@ local pos_data = {
 }
 
 local nvconfig = require "nvconfig"
+---@type TermConfig
 local config = nvconfig.term
 
 if config.base46_colors then
@@ -24,12 +27,16 @@ vim.g.nvhterm = false
 vim.g.nvvterm = false
 
 -------------------------- util funcs -----------------------------
+---@param index NvBufnr|string|integer
+---@param val? NvTermOptions
 local function save_term_info(index, val)
   local terms_list = g.nvchad_terms
   terms_list[tostring(index)] = val
   g.nvchad_terms = terms_list
 end
 
+---@param id string|integer|nil
+---@return NvTermOptions?
 local function opts_to_id(id)
   for _, opts in pairs(g.nvchad_terms) do
     if opts.id == id then
@@ -38,6 +45,8 @@ local function opts_to_id(id)
   end
 end
 
+---@param buffer NvBufnr
+---@param float_opts? TermFloat
 local function create_float(buffer, float_opts)
   local opts = vim.tbl_deep_extend("force", config.float, float_opts or {})
 
@@ -49,11 +58,14 @@ local function create_float(buffer, float_opts)
   vim.api.nvim_open_win(buffer, true, opts)
 end
 
+---@param cmd NvTermCommand
+---@return string
 local function format_cmd(cmd)
   return type(cmd) == "string" and cmd or cmd()
 end
 
 -- split 'shell' into argv so flags like "pwsh -NoLogo" or a quoted path work
+---@return string[]
 local function shell_argv()
   local shell = vim.o.shell
 
@@ -81,6 +93,7 @@ local function shell_argv()
   return args
 end
 
+---@param opts NvTermOptions
 M.display = function(opts)
   if opts.pos == "float" then
     create_float(opts.buf, opts.float_opts)
@@ -117,6 +130,7 @@ M.display = function(opts)
   save_term_info(opts.buf, opts)
 end
 
+---@param opts NvTermOptions
 local function create(opts)
   local buf_exists = opts.buf
   opts.buf = opts.buf or vim.api.nvim_create_buf(false, true)
@@ -140,10 +154,12 @@ local function create(opts)
 end
 
 --------------------------- user api -------------------------------
+---@param opts NvTermOptions
 M.new = function(opts)
   create(opts)
 end
 
+---@param opts NvTermOptions
 M.toggle = function(opts)
   local x = opts_to_id(opts.id)
   opts.buf = x and x.buf or nil
@@ -156,6 +172,7 @@ M.toggle = function(opts)
 end
 
 -- spawns term with *cmd & runs the *cmd if the keybind is run again
+---@param opts NvTermOptions
 M.runner = function(opts)
   local x = opts_to_id(opts.id)
   local clear_cmd = opts.clear_cmd or "clear; "
@@ -185,6 +202,7 @@ end
 
 --------------------------- autocmds -------------------------------
 api.nvim_create_autocmd("TermClose", {
+  ---@param args NvAutocmdCallbackArgs
   callback = function(args)
     save_term_info(args.buf, nil)
   end,

@@ -1,3 +1,4 @@
+---@type table<string, string>
 return {
   alejandra = "alejandra",
   als = "ada-language-server",

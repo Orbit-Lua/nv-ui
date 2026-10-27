@@ -11,6 +11,9 @@ local channel = function(v, a)
   return math.max(0, math.min(255, math.floor(v * a * 255 + 0.5)))
 end
 
+---@param buf NvBufnr
+---@param line integer
+---@param str string
 M.hex = function(buf, line, str)
   for col, hex in str:gmatch "()(#%x%x%x%x%x%x)" do
     col = col - 1
@@ -31,6 +34,10 @@ M.hex = function(buf, line, str)
   end
 end
 
+---@param buf NvBufnr
+---@param line? integer
+---@param min? integer
+---@param max? integer
 M.lsp_var = function(buf, line, min, max)
   local param = { textDocument = vim.lsp.util.make_text_document_params(buf) }
 
@@ -41,6 +48,7 @@ M.lsp_var = function(buf, line, min, max)
           return
         end
 
+        ---@cast resp NvLspColorInformation[]?
         if resp and line then
           resp = vim.tbl_filter(function(v)
             return v.range["start"].line == line

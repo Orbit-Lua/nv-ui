@@ -1,4 +1,5 @@
 local api = vim.api
+---@type ChadrcConfig
 local config = require "nvconfig"
 local new_cmd = api.nvim_create_user_command
 
