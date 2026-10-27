@@ -53,6 +53,34 @@ local function format_cmd(cmd)
   return type(cmd) == "string" and cmd or cmd()
 end
 
+-- split 'shell' into argv so flags like "pwsh -NoLogo" or a quoted path work
+local function shell_argv()
+  local shell = vim.o.shell
+
+  if vim.fn.executable(shell) == 1 then
+    return { shell }
+  end
+
+  local args, pos = {}, 1
+
+  while true do
+    local _, e, arg = shell:find('^%s*"([^"]*)"', pos)
+
+    if not e then
+      _, e, arg = shell:find("^%s*(%S+)", pos)
+    end
+
+    if not e then
+      break
+    end
+
+    table.insert(args, arg)
+    pos = e + 1
+  end
+
+  return args
+end
+
 M.display = function(opts)
   if opts.pos == "float" then
     create_float(opts.buf, opts.float_opts)
@@ -93,23 +121,18 @@ local function create(opts)
   local buf_exists = opts.buf
   opts.buf = opts.buf or vim.api.nvim_create_buf(false, true)
 
-  -- handle cmd opt
-  local shell = vim.o.shell
-  local cmd = shell
-
-  if opts.cmd and opts.buf then
-    cmd = { shell, "-c", format_cmd(opts.cmd) .. "; " .. shell }
-  else
-    cmd = vim.fn.executable(shell) == 1 and { shell } or shell
-  end
-
   M.display(opts)
 
   save_term_info(opts.buf, opts)
 
-  opts.termopen_opts = vim.tbl_extend("force", opts.termopen_opts or {}, { detach = false })
   if not buf_exists then
-    vim.fn.termopen(cmd, opts.termopen_opts)
+    opts.termopen_opts = vim.tbl_extend("force", opts.termopen_opts or {}, { detach = false, term = true })
+    local job_id = vim.fn.jobstart(shell_argv(), opts.termopen_opts)
+
+    -- type cmd into the interactive shell, so it works with any shell and stays open
+    if opts.cmd and job_id > 0 then
+      api.nvim_chan_send(job_id, format_cmd(opts.cmd) .. "\r")
+    end
   end
 
   vim.g.nvhterm = opts.pos == "sp"
@@ -156,7 +179,7 @@ M.runner = function(opts)
     end
 
     local job_id = vim.b[x.buf].terminal_job_id
-    vim.api.nvim_chan_send(job_id, clear_cmd .. cmd .. " \n")
+    vim.api.nvim_chan_send(job_id, clear_cmd .. cmd .. "\r")
   end
 end
 
